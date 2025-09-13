@@ -38,6 +38,7 @@ export default function App() {
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [snakeColor, setSnakeColor] = useState(getRandomColor());
+  const [speed, setSpeed] = useState(400); // velocidad en ms
   const moveRef = useRef(direction);
 
   useEffect(() => {
@@ -69,16 +70,23 @@ export default function App() {
         let newSnake = [newHead, ...prevSnake];
         if (newHead.x === food.x && newHead.y === food.y) {
           setFood(getRandomFood(newSnake));
-          setScore(s => s + 1);
-            setSnakeColor(getRandomColor());
+          setScore(s => {
+            const newScore = s + 1;
+            // Cada 7 frutas aumenta la velocidad un 10%
+            if (newScore % 5 === 0) {
+              setSpeed(prev => Math.max(50, Math.floor(prev * 0.5)));
+            }
+            return newScore;
+          });
+          setSnakeColor(getRandomColor());
         } else {
           newSnake.pop();
         }
         return newSnake;
       });
-    }, 250);
+    }, speed);
     return () => clearInterval(interval);
-  }, [food, gameOver]);
+  }, [food, gameOver, speed]);
 
   const handleDirection = (dir: string) => {
     // Prevent reverse
@@ -110,6 +118,7 @@ export default function App() {
     setGameOver(false);
     setScore(0);
     setSnakeColor(getRandomColor());
+    setSpeed(400);
   };
 
   return (
